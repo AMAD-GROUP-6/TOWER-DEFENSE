@@ -11,13 +11,13 @@ import android.util.Log;
 public class PoisonTower extends Tower {
 
     float poisonPercent = 0.999f;
-    int poisonFrames = 10;
+    int poisonFrames = 20;
     public static Bitmap imageTurret;
 
     public PoisonTower(int x, int y){
         super(x, y);
         cost = 3000;
-        delayFrames = 20;
+        delayFrames = 70;
         damage = 0;
         nextUpgradeCost = 1000;
         range = 150;
@@ -67,7 +67,7 @@ public class PoisonTower extends Tower {
 
     @Override
     public float getNextDelay() {
-        return delayFrames-2;
+        return Math.max(delayFrames-5, 20);
     }
 
     @Override
