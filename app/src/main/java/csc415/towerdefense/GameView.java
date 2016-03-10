@@ -393,7 +393,7 @@ public class GameView extends SurfaceView implements View.OnTouchListener, Surfa
 
         interest = getNextInterest();
         interestLevel++;
-        interestLevelCost *= 1.5f;
+        interestLevelCost += 100;
 
 
 
@@ -401,7 +401,7 @@ public class GameView extends SurfaceView implements View.OnTouchListener, Surfa
 
     public static float getNextInterest(){
 
-        return interest + 0.005f;
+        return interest + 0.01f;
 
     }
 

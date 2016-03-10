@@ -17,7 +17,7 @@ public class PoisonTower extends Tower {
     public PoisonTower(int x, int y){
         super(x, y);
         cost = 3000;
-        delayFrames = 80;
+        delayFrames = 20;
         damage = 0;
         nextUpgradeCost = 1000;
         range = 150;
@@ -81,7 +81,7 @@ public class PoisonTower extends Tower {
     }
 
     public float getNextPoisonPercent(){
-        return poisonPercent - 0.001f;
+        return poisonPercent - 0.003f;
     }
 
     public int getNextPoisonFrames(){
