@@ -48,9 +48,12 @@ public class CannonTower extends Tower{
         cost += nextUpgradeCost;
         nextUpgradeCost = (int)(nextUpgradeCost * costRatio);
 
-        delayFrames *= delayRatio;
-        damage *= damageRatio;
-        range *= rangeRatio;
+        delayFrames = getNextDelay();
+        damage = getNextDamage();
+        range = getNextRange();
+        splashRange = getNextSplashRange();
+        splashRange = getNextSplashRange();
+
         level++;
     }
 
