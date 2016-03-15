@@ -169,6 +169,7 @@ public class GameView extends SurfaceView implements View.OnTouchListener, Surfa
             loadGameInfo();
         }
 
+        saveGameInfo();
 
         widthRatio = WIDTH / (float)getWidth();
         heightRatio = HEIGHT/ (float)getHeight();

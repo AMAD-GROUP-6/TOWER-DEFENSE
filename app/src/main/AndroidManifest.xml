@@ -15,7 +15,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".GameScreen"></activity>
+        <activity android:name=".GameScreen"
+                  android:screenOrientation="portrait"
+                  android:configChanges="orientation|keyboardHidden" />
+        <activity android:name=".OptionsActivity"></activity>
     </application>
 
 </manifest>

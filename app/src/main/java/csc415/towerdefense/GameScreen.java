@@ -24,12 +24,28 @@ public class GameScreen extends Activity {
     protected void onPause(){
         super.onPause();
 
+        if(GameView.currentWave.isFinished){
+            GameView.saveGameInfo();
+        }
+
         isPaused = true;
+
+
 
     }
 
     protected void onResume(){
         super.onResume();
+
+        if(isPaused){
+
+            GameView g = new GameView(this);
+            g.loadGame = true;
+            setContentView(g);
+        }
+
+
+
 
         isPaused = false;
 

@@ -40,6 +40,7 @@ public class MainMenu extends Activity{
                 //Load game activity
                 Intent myIntent = new Intent(getApplicationContext(), GameScreen.class);
                 GameView.loadGame = false;
+                GameScreen.isPaused = false;
                 startActivity(myIntent);
             }
         });
@@ -49,6 +50,8 @@ public class MainMenu extends Activity{
             @Override
             public void onClick(View view) {
                 //Load options activity
+                Intent myIntent = new Intent(getApplicationContext(), OptionsActivity.class);
+                startActivity(myIntent);
 
             }
         });
