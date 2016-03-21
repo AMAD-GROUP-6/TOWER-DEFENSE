@@ -27,6 +27,7 @@ public class SoundPlayer extends AsyncTask<Void, Void, Void> {
     private Context c;
     boolean loop;
     int id;
+    MediaPlayer mp;
 
     public SoundPlayer(Context c,boolean loop,int id){
         this.c = c;
@@ -36,9 +37,14 @@ public class SoundPlayer extends AsyncTask<Void, Void, Void> {
     }
     @Override
     protected Void doInBackground(Void... params){
-        MediaPlayer mp = MediaPlayer.create(this.c,this.id);
+        mp = MediaPlayer.create(this.c,this.id);
         mp.setLooping(loop);
         mp.start();
         return null;
+    }
+
+    public void stop(){
+        mp.stop();
+        this.cancel(true);
     }
 }
