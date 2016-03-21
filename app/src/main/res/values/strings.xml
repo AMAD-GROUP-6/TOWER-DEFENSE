@@ -6,4 +6,8 @@
     <string name="dummy_content">DUMMY\nCONTENT</string>
 
     <string name="title_activity_options">OptionsActivity</string>
+    <string name="hide_nav_text">Hide Navigation Bar</string>
+    <string name="hide_nav_desc">For devices without hardware navigation buttons</string>
+    <string name="music_enabled_text">Background music enabled?</string>
+    <string name="sound_enabled_text">Sound effects enabled?</string>
 </resources>
