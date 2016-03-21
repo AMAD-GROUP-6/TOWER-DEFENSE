@@ -68,19 +68,21 @@ public class MainMenu extends Activity{
             }
         });
 
+        this.soundPlayer = null;
+
 
     }
 
     @Override
-    public void onPause(){
-        super.onPause();
+    public void onDestroy(){
         this.soundPlayer.stop();
+        super.onDestroy();
     }
 
     @Override
     public void onResume(){
         super.onResume();
-        this.soundPlayer = new SoundPlayer(this,true,R.raw.background_music);
+        if(this.soundPlayer == null || this.soundPlayer.isStopped())this.soundPlayer = new SoundPlayer(this,true,R.raw.background_music);
     }
 
 }

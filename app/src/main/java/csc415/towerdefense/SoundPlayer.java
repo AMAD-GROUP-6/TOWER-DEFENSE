@@ -25,15 +25,17 @@ import android.os.AsyncTask;
 
 public class SoundPlayer extends AsyncTask<Void, Void, Void> {
     private Context c;
-    boolean loop;
-    int id;
-    MediaPlayer mp;
+    private boolean loop;
+    private int id;
+    private MediaPlayer mp;
+    private boolean stopped;
 
     public SoundPlayer(Context c,boolean loop,int id){
         this.c = c;
         this.loop = loop;
         this.id = id;
         doInBackground();
+        this.stopped = false;
     }
     @Override
     protected Void doInBackground(Void... params){
@@ -46,5 +48,10 @@ public class SoundPlayer extends AsyncTask<Void, Void, Void> {
     public void stop(){
         mp.stop();
         this.cancel(true);
+        this.stopped = true;
+    }
+
+    public boolean isStopped(){
+        return this.stopped;
     }
 }
