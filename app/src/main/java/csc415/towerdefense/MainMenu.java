@@ -15,6 +15,7 @@ public class MainMenu extends Activity{
     ImageButton playButton;
     ImageButton optionsButton;
     ImageButton loadButton;
+    SoundPlayer soundPlayer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,6 +68,7 @@ public class MainMenu extends Activity{
             }
         });
 
+        this.soundPlayer = new SoundPlayer(this,true,R.raw.background_music);
 
     }
 
