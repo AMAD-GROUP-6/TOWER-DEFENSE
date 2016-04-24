@@ -23,6 +23,7 @@ public class MainMenu extends Activity{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        SharedState.context = getApplicationContext();
         //Make activity fullscreen
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
@@ -100,4 +101,9 @@ public class MainMenu extends Activity{
 
     }
 
+
+}
+
+class SharedState {
+    public static Context context;
 }

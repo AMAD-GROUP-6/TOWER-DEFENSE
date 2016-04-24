@@ -20,5 +20,5 @@
                   android:configChanges="orientation|keyboardHidden" />
         <activity android:name=".OptionsActivity"></activity>
     </application>
-
+    <uses-permission android:name="android.permission.VIBRATE" />
 </manifest>
