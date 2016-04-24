@@ -1,5 +1,6 @@
 package csc415.towerdefense;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -7,6 +8,7 @@ import android.graphics.ColorFilter;
 import android.graphics.LightingColorFilter;
 import android.graphics.Paint;
 import android.graphics.Point;
+import android.os.Vibrator;
 import android.support.annotation.CallSuper;
 
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -101,6 +103,8 @@ public abstract class Enemy {
                     } else {
                         hasEscaped = true;
                         GameView.lives--;
+
+                        ((Vibrator)SharedState.context.getSystemService(Context.VIBRATOR_SERVICE)).vibrate(100);
 
                         //Call the next line last in case of dead code
                         GameView.currentWave.enemies.remove(this);

@@ -380,6 +380,7 @@ public class GameView extends SurfaceView implements View.OnTouchListener, Surfa
         }
         catch (Exception e) {
             //You'll need to add proper error handling here
+            Log.e("tower-defense","Fatal error: couldn't load save file");
         }
 
     }

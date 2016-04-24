@@ -1,6 +1,7 @@
 package csc415.towerdefense;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -21,6 +22,7 @@ public class MainMenu extends Activity{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        SharedState.context = getApplicationContext();
         //Make activity fullscreen
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
@@ -85,4 +87,9 @@ public class MainMenu extends Activity{
         if(this.soundPlayer == null || this.soundPlayer.isStopped())this.soundPlayer = new SoundPlayer(this,true,R.raw.background_music);
     }
 
+
+}
+
+class SharedState {
+    public static Context context;
 }
