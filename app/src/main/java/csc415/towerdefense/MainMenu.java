@@ -3,6 +3,7 @@ package csc415.towerdefense;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
@@ -16,7 +17,7 @@ public class MainMenu extends Activity{
     ImageButton playButton;
     ImageButton optionsButton;
     ImageButton loadButton;
-    SoundPlayer soundPlayer;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,21 +71,34 @@ public class MainMenu extends Activity{
             }
         });
 
-        this.soundPlayer = null;
+
 
 
     }
 
     @Override
     public void onDestroy(){
-        this.soundPlayer.stop();
+
         super.onDestroy();
     }
 
     @Override
     public void onResume(){
         super.onResume();
-        if(this.soundPlayer == null || this.soundPlayer.isStopped())this.soundPlayer = new SoundPlayer(this,true,R.raw.background_music);
+
+        SharedPreferences sharedPref = getSharedPreferences("androidTowerDefensePrefs", Context.MODE_PRIVATE);
+        OptionsActivity.startingVolume = sharedPref.getInt("volume", 100);
+
+        Log.d("Volume: ", OptionsActivity.startingVolume + "" );
+
+    }
+
+    @Override
+    public void onPause(){
+        super.onPause();
+
+
+
     }
 
 

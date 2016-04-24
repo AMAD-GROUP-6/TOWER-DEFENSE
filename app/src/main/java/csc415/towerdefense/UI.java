@@ -1,5 +1,9 @@
 package csc415.towerdefense;
 
+import android.app.Application;
+import android.content.Context;
+import android.content.Intent;
+import android.content.pm.ApplicationInfo;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -26,6 +30,7 @@ public class UI {
     public static Bitmap imageFreezeTowerTurret;
     public static Bitmap imageBombTowerTurret;
     public static Bitmap imagePoisonTowerTurret;
+    public static Bitmap imageGameOver;
 
     public static Bitmap imageNextButton;
     public static Bitmap imageBackButton;
@@ -42,6 +47,9 @@ public class UI {
     public boolean isUpgradeMenu = false;
     public boolean isUpgradeInterest = false;
     public boolean isSellMenu = false;
+
+    public boolean isDead = false;
+    public int framesToDisplayDeathScreen = 90;//3 seconds
 
     public Tower aboutToBuild = null;
 
@@ -66,7 +74,10 @@ public class UI {
     public int framesSincePopup;
     public int FRAMES_TO_DISPLAY_POPUP = 60; //2 seconds
 
-    public UI() {
+    Context gameviewContext;
+
+    public UI(Context gameviewContext) {
+        this.gameviewContext = gameviewContext;
         textPaint = new Paint();
         smallTextPaint = new Paint();
         popupTextPaint = new Paint();
@@ -103,9 +114,6 @@ public class UI {
 
 
     public void draw(Canvas c) {
-
-
-
 
         if (!isSellMenu && !isUpgradeMenu && !isPlacing && isMain) {
             c.drawBitmap(imageBackground, 0, 640, null);
@@ -228,7 +236,7 @@ public class UI {
                     }
 
                     c.drawText("- " + aboutToBuild.cost, 565 - 10, 640 + 165 + 55, moneyLostPaint);
-
+                    aboutToBuild.drawStats(c, popupTextPaint);
                 }
             }
 
@@ -283,419 +291,426 @@ public class UI {
         }
 
 
+        if(isDead){
+            drawDeathScreen(c);
+            framesToDisplayDeathScreen--;
+            if(framesToDisplayDeathScreen <= 0){
+                Intent myIntent = new Intent(gameviewContext, MainMenu.class);
+                gameviewContext.startActivity(myIntent);
+            }
+        }
+
     }
 
 
     public boolean touched(Vector2f location) {
+        if(!isDead) {
+            if (showPopup) {
+                showPopup = false;
+                framesSincePopup = 0;
+                return false;
+            }
 
-        if(showPopup){
-            showPopup = false;
-            framesSincePopup = 0;
-            return false;
-        }
+
+            if (GameView.currentWave.isFinished && !isPlacing && !isMenu && !isUpgradeMenu && !isSellMenu) {
+                if (location.x > 640 - 192 && location.x < 640) {
+                    if (location.y > 640 - 128 && location.y < 640) {
+
+                        GameView.startNextWave();
+                        return false;
+                    }
+                }
+            }
+
+            if (isUpgradeInterest) {
+
+                if (location.y < 640) {
+
+                    for (Tower t : GameView.towers) {
+                        if (t.pos.x == (int) location.x / 64 && t.pos.y == (int) location.y / 64) {
+                            aboutToBuild = t;
+                            break;
+                        }
+                    }
+
+                    if (aboutToBuild != null) {
+                        isUpgradeMenu = true;
+                        isMain = false;
+                        isPage2 = false;
+                        isUpgradeInterest = false;
+                    }
 
 
-        if (GameView.currentWave.isFinished && !isPlacing && !isMenu && !isUpgradeMenu && !isSellMenu) {
-            if (location.x > 640 - 192 && location.x < 640) {
-                if (location.y > 640 - 128 && location.y < 640) {
-
-                    GameView.startNextWave();
                     return false;
                 }
+
+                if (location.x > 10 && location.x < 155) {
+                    //First row of buttons
+                    if (location.y > 650 && location.y < 795) {
+
+                        isPage2 = true;
+                        isUpgradeInterest = false;
+
+                    }
+                    //Second row of buttons
+                    if (location.y > 805 && location.y < 950) {
+
+                        if (GameView.money > GameView.interestLevelCost) {
+                            GameView.upgradeInterest(true);
+                        }
+
+                    }
+
+                }
             }
-        }
 
-        if(isUpgradeInterest){
+            if (isMain) {
 
-            if (location.y < 640) {
+                if (location.y < 640) {
 
-                for (Tower t : GameView.towers) {
-                    if (t.pos.x == (int) location.x / 64 && t.pos.y == (int) location.y / 64) {
-                        aboutToBuild = t;
-                        break;
+                    for (Tower t : GameView.towers) {
+                        if (t.pos.x == (int) location.x / 64 && t.pos.y == (int) location.y / 64) {
+                            aboutToBuild = t;
+                            break;
+                        }
+                    }
+
+                    if (aboutToBuild != null) {
+                        isUpgradeMenu = true;
+                        isMain = false;
+                        isPage2 = false;
+                        isUpgradeInterest = false;
+                    }
+
+
+                    return false;
+                }
+
+
+                //First column of buttons
+                if (location.x > 10 && location.x < 155) {
+                    //First row of buttons
+                    if (location.y > 650 && location.y < 795) {
+                        Log.d("Touched button:", " Button 1");
+
+                        if (GameView.money >= new PelletTower(-10000, 10000).cost) {
+                            isPlacing = true;
+                            isMain = false;
+                            aboutToBuild = new PelletTower(4, 5);
+                        } else {
+                            //show indication of not enough money
+                            popupText = "Not enough money.\nCost: " + new PelletTower(-10000, 10000).cost + "\n\nPellet tower";
+                            showPopup = true;
+                            FRAMES_TO_DISPLAY_POPUP = 60;
+                        }
+                    }
+                    //Second row of buttons
+                    if (location.y > 805 && location.y < 950) {
+                        Log.d("Touched button:", " Button 5");
+
+                        isSellMenu = true;
+                        isMain = false;
+
+                    }
+
+                }
+                //Second column of buttons
+                if (location.x > 165 && location.x < 310) {
+                    //First row of buttons
+                    if (location.y > 650 && location.y < 795) {
+                        Log.d("Touched button:", " Button 2");
+
+                        if (GameView.money >= new FreezeTower(-10000, 10000).cost) {
+                            isPlacing = true;
+                            isMain = false;
+                            aboutToBuild = new FreezeTower(4, 5);
+                        } else {
+                            //show indication of not enough money
+                            popupText = "Not enough money.\nCost: " + new FreezeTower(-10000, 10000).cost+ "\n\nFreeze tower";
+                            showPopup = true;
+                            FRAMES_TO_DISPLAY_POPUP = 60;
+                        }
+
+                    }
+                    //Second row of buttons
+                    if (location.y > 805 && location.y < 950) {
+
+                        isPage2 = true;
+                        isMain = false;
+
                     }
                 }
+                //Third column of buttons
+                if (location.x > 320 && location.x < 465) {
+                    //First row of buttons
+                    if (location.y > 650 && location.y < 795) {
+                        Log.d("Touched button:", " Button 3");
+                        if (GameView.money >= new CannonTower(-10000, 10000).cost) {
+                            isPlacing = true;
+                            isMain = false;
+                            aboutToBuild = new CannonTower(4, 5);
+                        } else {
+                            //show indication of not enough money
+                            popupText = "Not enough money.\nCost: " + new CannonTower(-10000, 10000).cost+ "\n\nCannon tower";
+                            showPopup = true;
+                            FRAMES_TO_DISPLAY_POPUP = 60;
+                        }
 
-                if(aboutToBuild != null){
-                    isUpgradeMenu = true;
-                    isMain= false;
-                    isPage2 = false;
-                    isUpgradeInterest = false;
+                    }
+                    //Second row of buttons
+                    if (location.y > 805 && location.y < 950) {
+                        // GameView.currentWave = new Wave(GameView.currentWave.waveNumber + 10);
+                        // GameView.currentWave.isFinished = true;
+                    }
                 }
+                //Fourth column of buttons
+                if (location.x > 475 && location.x < 620) {
+                    //First row of buttons
+                    if (location.y > 650 && location.y < 795) {
 
-
+                        if (GameView.money >= new PoisonTower(-10000, 10000).cost) {
+                            isPlacing = true;
+                            isMain = false;
+                            aboutToBuild = new PoisonTower(4, 5);
+                        } else {
+                            //show indication of not enough money
+                            popupText = "Not enough money.\nCost: " + new PoisonTower(-10000, 10000).cost+ "\n\nPoison tower";
+                            showPopup = true;
+                            FRAMES_TO_DISPLAY_POPUP = 60;
+                        }
+                    }
+                    //Second row of buttons
+                    if (location.y > 805 && location.y < 950) {
+                        //GameView.money += 10000;
+                    }
+                }
                 return false;
-            }
 
-            if (location.x > 10 && location.x < 155) {
-                //First row of buttons
-                if (location.y > 650 && location.y < 795) {
+            } //End main ui buttons
 
-                    isPage2 = true;
-                    isUpgradeInterest = false;
 
+            if (isPage2) {
+
+                if (location.y < 640) {
+
+                    for (Tower t : GameView.towers) {
+                        if (t.pos.x == (int) location.x / 64 && t.pos.y == (int) location.y / 64) {
+                            aboutToBuild = t;
+                            break;
+                        }
+                    }
+
+                    if (aboutToBuild != null) {
+                        isUpgradeMenu = true;
+                        isPage2 = false;
+                        isMain = false;
+                        isUpgradeInterest = false;
+                    }
+
+
+                    return false;
                 }
-                //Second row of buttons
-                if (location.y > 805 && location.y < 950) {
 
-                    if(GameView.money > GameView.interestLevelCost){
-                        GameView.upgradeInterest(true);
+
+                //First column of buttons
+                if (location.x > 10 && location.x < 155) {
+                    //First row of buttons
+                    if (location.y > 650 && location.y < 795) {
+
+
+                    }
+                    //Second row of buttons
+                    if (location.y > 805 && location.y < 950) {
+                        isSellMenu = true;
+                        isMain = false;
+                        isPage2 = false;
+
                     }
 
                 }
+                //Second column of buttons
+                if (location.x > 165 && location.x < 310) {
+                    //First row of buttons
+                    if (location.y > 650 && location.y < 795) {
 
-            }
-        }
 
-        if (isMain) {
+                    }
+                    //Second row of buttons
+                    if (location.y > 805 && location.y < 950) {
 
-            if (location.y < 640) {
+                        isPage2 = false;
+                        isMain = true;
 
-                for (Tower t : GameView.towers) {
-                    if (t.pos.x == (int) location.x / 64 && t.pos.y == (int) location.y / 64) {
-                        aboutToBuild = t;
-                        break;
                     }
                 }
+                //Third column of buttons
+                if (location.x > 320 && location.x < 465) {
+                    //First row of buttons
+                    if (location.y > 650 && location.y < 795) {
 
-                if(aboutToBuild != null){
-                    isUpgradeMenu = true;
-                    isMain= false;
-                    isPage2 = false;
-                    isUpgradeInterest = false;
+
+                    }
+                    //Second row of buttons
+                    if (location.y > 805 && location.y < 950) {
+
+                    }
                 }
+                //Fourth column of buttons
+                if (location.x > 475 && location.x < 620) {
+                    //First row of buttons
+                    if (location.y > 650 && location.y < 795) {
 
+                        isUpgradeInterest = true;
+                        isPage2 = false;
 
+                    }
+                    //Second row of buttons
+                    if (location.y > 805 && location.y < 950) {
+
+                    }
+                }
                 return false;
-            }
+
+            } //End 2nd page ui buttons
 
 
-            //First column of buttons
-            if (location.x > 10 && location.x < 155) {
-                //First row of buttons
-                if (location.y > 650 && location.y < 795) {
-                    Log.d("Touched button:", " Button 1");
+            if (isPlacing) {
 
-                    if (GameView.money >= new PelletTower(-10000, 10000).cost) {
-                        isPlacing = true;
-                        isMain = false;
-                        aboutToBuild = new PelletTower(4, 5);
-                    } else {
-                        //show indication of not enough money
-                        popupText = "Not enough money.";
-                        showPopup = true;
-                        FRAMES_TO_DISPLAY_POPUP = 60;
-                    }
-                }
-                //Second row of buttons
-                if (location.y > 805 && location.y < 950) {
-                    Log.d("Touched button:", " Button 5");
+                if (location.y < 640) {
+                    aboutToBuild.pos = new Vector2f((int) location.x / 64, (int) location.y / 64);
 
-                    isSellMenu = true;
-                    isMain = false;
-
+                    return true;
                 }
 
-            }
-            //Second column of buttons
-            if (location.x > 165 && location.x < 310) {
-                //First row of buttons
-                if (location.y > 650 && location.y < 795) {
-                    Log.d("Touched button:", " Button 2");
-
-                    if (GameView.money >= new FreezeTower(-10000, 10000).cost) {
-                        isPlacing = true;
-                        isMain = false;
-                        aboutToBuild = new FreezeTower(4, 5);
-                    } else {
-                        //show indication of not enough money
-                        popupText = "Not enough money.";
-                        showPopup = true;
-                        FRAMES_TO_DISPLAY_POPUP = 60;
-                    }
-
-                }
-                //Second row of buttons
-                if (location.y > 805 && location.y < 950) {
-
-                    isPage2 = true;
-                    isMain = false;
-
-                }
-            }
-            //Third column of buttons
-            if (location.x > 320 && location.x < 465) {
-                //First row of buttons
-                if (location.y > 650 && location.y < 795) {
-                    Log.d("Touched button:", " Button 3");
-                    if (GameView.money >= new CannonTower(-10000, 10000).cost) {
-                        isPlacing = true;
-                        isMain = false;
-                        aboutToBuild = new CannonTower(4, 5);
-                    } else {
-                        //show indication of not enough money
-                        popupText = "Not enough money.";
-                        showPopup = true;
-                        FRAMES_TO_DISPLAY_POPUP = 60;
-                    }
-
-                }
-                //Second row of buttons
-                if (location.y > 805 && location.y < 950) {
-                   // GameView.currentWave = new Wave(GameView.currentWave.waveNumber + 10);
-                   // GameView.currentWave.isFinished = true;
-                }
-            }
-            //Fourth column of buttons
-            if (location.x > 475 && location.x < 620) {
-                //First row of buttons
-                if (location.y > 650 && location.y < 795) {
-
-                    if (GameView.money >= new PoisonTower(-10000, 10000).cost) {
-                        isPlacing = true;
-                        isMain = false;
-                        aboutToBuild = new PoisonTower(4, 5);
-                    } else {
-                        //show indication of not enough money
-                        popupText = "Not enough money.";
-                        showPopup = true;
-                        FRAMES_TO_DISPLAY_POPUP = 60;
-                    }
-                }
-                //Second row of buttons
-                if (location.y > 805 && location.y < 950) {
-                    //GameView.money += 10000;
-                }
-            }
-            return false;
-
-        } //End main ui buttons
-
-
-        if (isPage2) {
-
-            if (location.y < 640) {
-
-                for (Tower t : GameView.towers) {
-                    if (t.pos.x == (int) location.x / 64 && t.pos.y == (int) location.y / 64) {
-                        aboutToBuild = t;
-                        break;
-                    }
-                }
-
-                if(aboutToBuild != null){
-                    isUpgradeMenu = true;
-                    isPage2 = false;
-                    isMain = false;
-                    isUpgradeInterest = false;
-                }
-
-
-                return false;
-            }
-
-
-            //First column of buttons
-            if (location.x > 10 && location.x < 155) {
-                //First row of buttons
-                if (location.y > 650 && location.y < 795) {
-
-
-                }
-                //Second row of buttons
-                if (location.y > 805 && location.y < 950) {
-                    isSellMenu = true;
-                    isMain = false;
-                    isPage2 = false;
-
-                }
-
-            }
-            //Second column of buttons
-            if (location.x > 165 && location.x < 310) {
-                //First row of buttons
-                if (location.y > 650 && location.y < 795) {
-
-
-                }
-                //Second row of buttons
-                if (location.y > 805 && location.y < 950) {
-
-                    isPage2 = false;
-                    isMain = true;
-
-                }
-            }
-            //Third column of buttons
-            if (location.x > 320 && location.x < 465) {
-                //First row of buttons
-                if (location.y > 650 && location.y < 795) {
-
-
-
-
-                }
-                //Second row of buttons
-                if (location.y > 805 && location.y < 950) {
-
-                }
-            }
-            //Fourth column of buttons
-            if (location.x > 475 && location.x < 620) {
-                //First row of buttons
-                if (location.y > 650 && location.y < 795) {
-
-                    isUpgradeInterest = true;
-                    isPage2 = false;
-
-                }
-                //Second row of buttons
-                if (location.y > 805 && location.y < 950) {
-
-                }
-            }
-            return false;
-
-        } //End 2nd page ui buttons
-
-
-        if (isPlacing) {
-
-            if (location.y < 640) {
-                aboutToBuild.pos = new Vector2f((int) location.x / 64, (int) location.y / 64);
-
-                return true;
-            }
-
-            if (location.x > 10 && location.x < 155) {
-                //First row of buttons
-                if (location.y > 650 && location.y < 795) {
-
-                    aboutToBuild = null;
-
-                    isMain = true;
-                    isPlacing = false;
-                }
-                //Second row of buttons
-                if (location.y > 805 && location.y < 950) {
-                    Log.d("Touched button:", " Button 5");
-                    if (GameView.map.placeable[(int) aboutToBuild.pos.y][(int) aboutToBuild.pos.x] == 0) {
-                        Log.d("pressed confirm", "pressed confirm");
-                        GameView.towers.add(aboutToBuild);
-                        GameView.map.placeable[(int) aboutToBuild.pos.y][(int) aboutToBuild.pos.x] = 1;
-
-                        GameView.money -= aboutToBuild.cost;
+                if (location.x > 10 && location.x < 155) {
+                    //First row of buttons
+                    if (location.y > 650 && location.y < 795) {
 
                         aboutToBuild = null;
 
                         isMain = true;
                         isPlacing = false;
                     }
-                }
+                    //Second row of buttons
+                    if (location.y > 805 && location.y < 950) {
+                        Log.d("Touched button:", " Button 5");
+                        if (GameView.map.placeable[(int) aboutToBuild.pos.y][(int) aboutToBuild.pos.x] == 0) {
+                            Log.d("pressed confirm", "pressed confirm");
+                            GameView.towers.add(aboutToBuild);
+                            GameView.map.placeable[(int) aboutToBuild.pos.y][(int) aboutToBuild.pos.x] = 1;
 
-            }
+                            GameView.money -= aboutToBuild.cost;
 
-            return false;
+                            aboutToBuild = null;
 
-        } //end isPlacing
-
-        if (isMenu) {
-
-
-        } //end isMenu
-
-        if (isSellMenu) {
-
-            if (location.y < 640) {
-
-                for (Tower t : GameView.towers) {
-                    if (t.pos.x == (int) location.x / 64 && t.pos.y == (int) location.y / 64) {
-                        aboutToBuild = t;
-                        break;
+                            isMain = true;
+                            isPlacing = false;
+                        }
                     }
+
                 }
 
                 return false;
-            }
 
-            if (location.x > 10 && location.x < 155) {
-                //First row of buttons
-                if (location.y > 650 && location.y < 795) {
-                    aboutToBuild = null;
+            } //end isPlacing
 
-                    isMain = true;
-                    isUpgradeInterest = false;
-                    isSellMenu = false;
+            if (isMenu) {
+
+
+            } //end isMenu
+
+            if (isSellMenu) {
+
+                if (location.y < 640) {
+
+                    for (Tower t : GameView.towers) {
+                        if (t.pos.x == (int) location.x / 64 && t.pos.y == (int) location.y / 64) {
+                            aboutToBuild = t;
+                            break;
+                        }
+                    }
+
+                    return false;
                 }
-                //Second row of buttons
-                if (location.y > 805 && location.y < 950) {
-                    if (aboutToBuild != null) {
 
-                        GameView.towers.remove(aboutToBuild);
-                        GameView.map.placeable[(int) aboutToBuild.pos.y][(int) aboutToBuild.pos.x] = 0;
-                        GameView.money += (int) (aboutToBuild.cost / 2);
+                if (location.x > 10 && location.x < 155) {
+                    //First row of buttons
+                    if (location.y > 650 && location.y < 795) {
                         aboutToBuild = null;
+
                         isMain = true;
+                        isUpgradeInterest = false;
                         isSellMenu = false;
-                        aboutToBuild = null;
+                    }
+                    //Second row of buttons
+                    if (location.y > 805 && location.y < 950) {
+                        if (aboutToBuild != null) {
+
+                            GameView.towers.remove(aboutToBuild);
+                            GameView.map.placeable[(int) aboutToBuild.pos.y][(int) aboutToBuild.pos.x] = 0;
+                            GameView.money += (int) (aboutToBuild.cost / 2);
+                            aboutToBuild = null;
+                            isMain = true;
+                            isSellMenu = false;
+                            aboutToBuild = null;
+                        }
+
                     }
 
                 }
 
-            }
-
-        } //end isSellMenu
+            } //end isSellMenu
 
 
-        if (isUpgradeMenu) {
-            if (location.y < 640) {
+            if (isUpgradeMenu) {
+                if (location.y < 640) {
 
-                aboutToBuild = null;
-
-                for (Tower t : GameView.towers) {
-                    if (t.pos.x == (int) location.x / 64 && t.pos.y == (int) location.y / 64) {
-                        aboutToBuild = t;
-                        break;
-                    }
-                }
-
-                if(aboutToBuild == null){
-                    isMain = true;
-                    isUpgradeMenu = false;
-                }
-
-                return false;
-            }
-
-
-            if (location.x > 10 && location.x < 155) {
-                //First row of buttons
-                if (location.y > 650 && location.y < 795) {
-
-
-                    isMain = true;
-                    isUpgradeMenu = false;
                     aboutToBuild = null;
-                    //cancel
+
+                    for (Tower t : GameView.towers) {
+                        if (t.pos.x == (int) location.x / 64 && t.pos.y == (int) location.y / 64) {
+                            aboutToBuild = t;
+                            break;
+                        }
+                    }
+
+                    if (aboutToBuild == null) {
+                        isMain = true;
+                        isUpgradeMenu = false;
+                    }
+
+                    return false;
                 }
-                //Second row of buttons
-                if (location.y > 805 && location.y < 950) {
-                    //confirm
-                    if (GameView.money >= aboutToBuild.nextUpgradeCost) {
-                        aboutToBuild.upgradeTower(true);
-                    }else{
-                        popupText = "Not enough money.";
-                        showPopup = true;
-                        FRAMES_TO_DISPLAY_POPUP = 60;
+
+
+                if (location.x > 10 && location.x < 155) {
+                    //First row of buttons
+                    if (location.y > 650 && location.y < 795) {
+
+
+                        isMain = true;
+                        isUpgradeMenu = false;
+                        aboutToBuild = null;
+                        //cancel
+                    }
+                    //Second row of buttons
+                    if (location.y > 805 && location.y < 950) {
+                        //confirm
+                        if (GameView.money >= aboutToBuild.nextUpgradeCost) {
+                            aboutToBuild.upgradeTower(true);
+                        } else {
+                            popupText = "Not enough money.";
+                            showPopup = true;
+                            FRAMES_TO_DISPLAY_POPUP = 60;
+                        }
+
                     }
 
                 }
 
-            }
 
-
-        } // end isUpgradeMenu
-
+            } // end isUpgradeMenu
+        }
         return false;
     }
 
@@ -708,6 +723,12 @@ public class UI {
             canvas.drawText(parts[i], cx, cy - textBounds.exactCenterY() + (textBounds.height() + 4) * i, paint);
         }
 
+
+    }
+
+    public void drawDeathScreen(Canvas c){
+
+        c.drawBitmap(imageGameOver, 0, 0, null);
 
     }
 

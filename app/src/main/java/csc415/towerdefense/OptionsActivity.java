@@ -1,6 +1,9 @@
 package csc415.towerdefense;
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.media.MediaPlayer;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Window;
@@ -19,6 +22,10 @@ public class OptionsActivity extends Activity implements SeekBar.OnSeekBarChange
     Switch musicEnabledSwitch;
     Switch soundEnabledSwitch;
     Switch hideNavBar; // for devices that don't have hardware nav buttons (home, back, recents), they have on screen buttons
+
+    public static int startingVolume = 0;
+
+    SoundPlayer soundOnChanged;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +46,22 @@ public class OptionsActivity extends Activity implements SeekBar.OnSeekBarChange
         musicEnabledSwitch.setOnCheckedChangeListener(this);
         soundEnabledSwitch.setOnCheckedChangeListener(this);
 
+
+        soundOnChanged = null;
+    }
+
+    @Override
+    protected void onResume(){
+        super.onResume();
+
+        SharedPreferences sharedPref = getSharedPreferences("androidTowerDefensePrefs", Context.MODE_PRIVATE);
+        OptionsActivity.startingVolume = sharedPref.getInt("volume", 100);
+
+
+
+        if(this.soundOnChanged == null || this.soundOnChanged.isStopped()) soundOnChanged = new SoundPlayer(this, false, R.raw.change_settings, false);
+
+        volume.setProgress(OptionsActivity.startingVolume);
     }
 
     @Override
@@ -56,7 +79,24 @@ public class OptionsActivity extends Activity implements SeekBar.OnSeekBarChange
 
         if(seekBar.equals(volume)) {
 
+
+                soundOnChanged.setVolume(volume.getProgress());
+
+                soundOnChanged.restart();
+
+
             txtVolume.setText(volume.getProgress() + "");
+            SoundPlayer.startingVolume = volume.getProgress();
+            SharedPreferences sharedPref = getSharedPreferences("androidTowerDefensePrefs", Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPref.edit();
+            editor.putInt("volume", volume.getProgress());
+            editor.commit();
+
+            for(SoundPlayer s : SoundPlayer.allSoundPlayers){
+                s.setVolume(sharedPref.getInt("volume", 100));
+            }
+
+
 
         }
 
