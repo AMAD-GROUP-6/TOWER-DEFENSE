@@ -44,6 +44,8 @@ public class GameView extends SurfaceView implements View.OnTouchListener, Surfa
 
     public static boolean loadGame = true;
 
+
+
     private GameThread thread;
 
     public static Map map;
@@ -135,7 +137,7 @@ public class GameView extends SurfaceView implements View.OnTouchListener, Surfa
         UI.imageHearts = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.heart), 65, 65, false);
         UI.imageMoney = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.money), 65, 65, false);
         UI.imagePercentInterest = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.interest), 42, 42, false);
-
+        UI.imageGameOver = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.gameover), 640, 640, false);
 
         UI.imageConfirm = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.confirm), 145, 145, false);
         UI.imageCancel = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.cancel), 145, 145, false);
@@ -155,7 +157,7 @@ public class GameView extends SurfaceView implements View.OnTouchListener, Surfa
         UI.imageBackButton =  Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.backbutton), 145, 145, false);
 
 
-        ui = new UI();
+        ui = new UI(myContext);
         ////////////////////////////////////////////////
 
         if(!thread.running){
@@ -190,17 +192,23 @@ public class GameView extends SurfaceView implements View.OnTouchListener, Surfa
 
     public void update(){
 
-        for(Enemy e : currentWave.enemies){
-            e.update();
-        }
 
-        for(Tower t : towers){
-            t.update();
-            for(Projectile p : t.projectiles){
-                p.update();
+            for(Enemy e : currentWave.enemies){
+                e.update();
             }
 
+            for(Tower t : towers){
+                t.update();
+                for(Projectile p : t.projectiles){
+                    p.update();
+                }
+
+            }
+
+        if(lives <= 0){
+            ui.isDead = true;
         }
+
 
     }
 
@@ -231,6 +239,7 @@ public class GameView extends SurfaceView implements View.OnTouchListener, Surfa
 
             for(Tower t : towers){
                 for(Projectile p : t.projectiles){
+                    //separate loops because sometimes projectiles would draw under towers
                     p.draw(canvas);
                 }
             }

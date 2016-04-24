@@ -24,10 +24,10 @@
         android:layout_height="wrap_content"
         android:id="@+id/seekBarVolume"
         android:layout_gravity="center_horizontal|top"
+        android:paddingTop="5dp"
         android:layout_below="@+id/textView"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:paddingTop="5dp" />
+        android:layout_alignParentStart="true" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -77,7 +77,8 @@
         android:id="@+id/music_enabled_switch"
         android:layout_below="@+id/textView2"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+        android:layout_alignParentStart="true"
+        android:checked="true" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -95,5 +96,6 @@
         android:id="@+id/sound_effects_enabled_switch"
         android:layout_below="@+id/textView3"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+        android:layout_alignParentStart="true"
+        android:checked="true" />
 </RelativeLayout>
