@@ -106,4 +106,5 @@ public class MainMenu extends Activity{
 
 class SharedState {
     public static Context context;
+    public static boolean soundenabled=true,musicenabled=true;
 }

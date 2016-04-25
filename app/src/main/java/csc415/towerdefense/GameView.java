@@ -181,7 +181,7 @@ public class GameView extends SurfaceView implements View.OnTouchListener, Surfa
     public boolean onTouch(View v, MotionEvent event) {
 
         if(event.getAction()==MotionEvent.ACTION_DOWN){
-            new SoundPlayer(myContext,false,R.raw.click,false);
+            if(SharedState.soundenabled)new SoundPlayer(myContext,false,R.raw.click,false);
         }
 
         Vector2f temp = new Vector2f(event.getX(), event.getY());

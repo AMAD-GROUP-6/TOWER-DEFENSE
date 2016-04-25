@@ -34,7 +34,7 @@ public class GameScreen extends Activity {
         if(GameView.currentWave.isFinished){
             GameView.saveGameInfo();
         }
-        this.soundPlayer.pause();
+        if(this.soundPlayer!=null)this.soundPlayer.pause();
         isPaused = true;
 
 
@@ -56,9 +56,9 @@ public class GameScreen extends Activity {
         SharedPreferences sharedPref = getSharedPreferences("androidTowerDefensePrefs", Context.MODE_PRIVATE);
         OptionsActivity.startingVolume = sharedPref.getInt("volume", 100);
 
-        if(this.soundPlayer == null || this.soundPlayer.isStopped())this.soundPlayer = new SoundPlayer(this,true,R.raw.background_music, true);
+        if(SharedState.musicenabled && (this.soundPlayer == null || this.soundPlayer.isStopped()))this.soundPlayer = new SoundPlayer(this,true,R.raw.background_music, true);
 
-        this.soundPlayer.resume();
+        if(this.soundPlayer!=null)this.soundPlayer.resume();
 
     }
 
@@ -66,7 +66,7 @@ public class GameScreen extends Activity {
     protected void onDestroy() {
         super.onDestroy();
 
-        this.soundPlayer.stop();
+       if(this.soundPlayer!=null) this.soundPlayer.stop();
 
     }
 }

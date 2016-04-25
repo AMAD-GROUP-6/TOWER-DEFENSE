@@ -66,12 +66,12 @@ public class OptionsActivity extends Activity implements SeekBar.OnSeekBarChange
 
     @Override
     public void onCheckedChanged(CompoundButton s, boolean checked) {
-       /* if(s == this.musicEnabledSwitch){
-
+        if(s == this.musicEnabledSwitch){
+            SharedState.musicenabled=checked;
         }
         else if (s == this.soundEnabledSwitch) {
-
-        }*/
+            SharedState.soundenabled=checked;
+        }
     }
 
     @Override
