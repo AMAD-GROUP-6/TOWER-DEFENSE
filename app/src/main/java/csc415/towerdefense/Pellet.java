@@ -14,6 +14,7 @@ public class Pellet extends Projectile {
     public Pellet(Enemy target, float speed, long damage, Vector2f pos){
         super(target, speed, damage, pos);
         image = Bitmap.createScaledBitmap(image, 5, 5, false);
+        new SoundPlayer(SharedState.context,false,R.raw.boop,false);
     }
 
     public void draw(Canvas c){
