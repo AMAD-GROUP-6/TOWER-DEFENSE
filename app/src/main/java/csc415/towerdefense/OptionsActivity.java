@@ -72,6 +72,9 @@ public class OptionsActivity extends Activity implements SeekBar.OnSeekBarChange
         else if (s == this.soundEnabledSwitch) {
             SharedState.soundenabled=checked;
         }
+        else if(s==hideNavBar){
+            SharedState.hidenav=checked;
+        }
     }
 
     @Override

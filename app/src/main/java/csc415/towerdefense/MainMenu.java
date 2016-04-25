@@ -27,6 +27,14 @@ public class MainMenu extends Activity{
         //Make activity fullscreen
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        if(SharedState.hidenav)
+            getWindow().getDecorView().setSystemUiVisibility(
+                    View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                            | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                            | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                            | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                            | View.SYSTEM_UI_FLAG_FULLSCREEN
+                            | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
         setContentView(R.layout.activity_main_menu);
 
         //instantiate buttons / make backgrounds transparent
@@ -106,5 +114,5 @@ public class MainMenu extends Activity{
 
 class SharedState {
     public static Context context;
-    public static boolean soundenabled=true,musicenabled=true;
+    public static boolean soundenabled=true,musicenabled=true,hidenav=true;
 }
